@@ -1,0 +1,58 @@
+_schema-version: '3.1'
+ID: CAP1
+version: 1.0.0
+description: A simple CAP project.
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm install --production
+        - npx -p @sap/cds-dk cds build --production
+modules:
+  - name: CAP1-srv
+    type: nodejs
+    path: gen/srv
+    requires:
+      - name: CAP-xsuaa
+      - name: CAP1-db
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: '${default-url}'
+  - name: cap1-ui
+    type: nodejs
+    path: app
+    requires:
+      - name: srv-api
+        group: destinations
+        properties:
+          forwardAuthToken: true
+          strictSSL: true
+          name: srv-api
+          url: ~{srv-url}
+      - name: CAP-xsuaa
+  - name: CAP1-db-deployer
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: CAP1-db
+resources:
+  - name: CAP1-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+    properties:
+      hdi-service-name: '${service-name}'
+  - name: CAP-xsuaa
+    type: com.sap.xs.uaa
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-plan: application
+      service-keys:
+        - name: CAP-xsuaa-key

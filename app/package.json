@@ -1,0 +1,14 @@
+{
+  "name": "cap-ui",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node node_modules/@sap/approuter/approuter.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "shikhil",
+  "license": "ISC",
+  "dependencies": {
+    "@sap/approuter": "^9.2.0"
+  }
+}
